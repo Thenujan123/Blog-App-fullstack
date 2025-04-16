@@ -3,11 +3,18 @@ import { BlogSchema } from "@/Schemas/blog.schema";
 import { NextRequest, NextResponse } from "next/server";
 import { handleError } from "../helpers/handleError";
 import getPaginationParams from "../helpers/getPaginationParams";
-import { title } from "process";
+import { headers } from "next/headers";
+import { verifyToken } from "../helpers/verifyToken";
+import { decodeToken } from "../helpers/decodeToken";
 
 export const POST = async (req: NextRequest) => {
   try {
-    const userID = req.nextUrl.searchParams.get("uid") || "";
+    const bearer = (await headers()).get("Authorization") || "";
+    const token = bearer.split("Bearer ")[1];
+    verifyToken(token);
+    const dct = decodeToken(token);
+
+    const userID = dct!.id;
     const body = await req.json();
     const validatedData = BlogSchema.parse(body);
     const isSlugExist = await prisma.blog.findUnique({

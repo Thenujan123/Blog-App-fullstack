@@ -9,6 +9,22 @@ export const handleError = ({
   defaultErr: string;
 }) => {
   console.log(error);
+  if (error.code === "TOKEN_EXPIRED") {
+    return NextResponse.json(
+      {
+        message: error.message,
+      },
+      { status: 400 }
+    );
+  }
+  if (error.code === "TOKEN_INVALID") {
+    return NextResponse.json(
+      {
+        message: error.message,
+      },
+      { status: 400 }
+    );
+  }
   if (error instanceof z.ZodError) {
     return NextResponse.json(
       {

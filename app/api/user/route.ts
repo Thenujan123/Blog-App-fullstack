@@ -3,6 +3,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { hash } from "bcryptjs";
 import prisma from "@/lib/prisma";
 import { handleError } from "../helpers/handleError";
+import generateToken from "../helpers/generateToken";
 export const POST = async (req: NextRequest) => {
   try {
     const body = await req.json();
@@ -24,10 +25,12 @@ export const POST = async (req: NextRequest) => {
     const newUSer = await prisma.user.create({
       data: { ...validatedData, password: hashedPassword },
     });
+    const token = generateToken(newUSer.id);
     return NextResponse.json(
       {
         succes: true,
         newUSer,
+        token,
       },
       { status: 201 }
     );
