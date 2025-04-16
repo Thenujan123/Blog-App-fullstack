@@ -3,6 +3,7 @@ import { BlogSchema } from "@/Schemas/blog.schema";
 import { NextRequest, NextResponse } from "next/server";
 import { handleError } from "../helpers/handleError";
 import getPaginationParams from "../helpers/getPaginationParams";
+import { title } from "process";
 
 export const POST = async (req: NextRequest) => {
   try {
@@ -58,9 +59,27 @@ export const POST = async (req: NextRequest) => {
 
 export const GET = async (req: NextRequest) => {
   try {
+    const search = req.nextUrl.searchParams.get("search");
+    const searchText = search
+      ? {
+          OR: [
+            {
+              title: {
+                contains: search,
+              },
+            },
+            {
+              content: {
+                contains: search,
+              },
+            },
+          ],
+        }
+      : {};
     const { page, size } = getPaginationParams({ req });
     const [allBlogs, count] = await prisma.$transaction([
       prisma.blog.findMany({
+        where: searchText,
         omit: { createdAt: true, updatedAt: true },
         skip: (page - 1) * size,
         take: size,
