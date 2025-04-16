@@ -3,62 +3,57 @@ import { BlogSchema } from "@/Schemas/blog.schema";
 import { NextRequest, NextResponse } from "next/server";
 import { handleError } from "../helpers/handleError";
 import getPaginationParams from "../helpers/getPaginationParams";
-import { headers } from "next/headers";
-import { verifyToken } from "../helpers/verifyToken";
-import { decodeToken } from "../helpers/decodeToken";
+import privateRoute from "../helpers/privateRoute";
 
 export const POST = async (req: NextRequest) => {
   try {
-    const bearer = (await headers()).get("Authorization") || "";
-    const token = bearer.split("Bearer ")[1];
-    verifyToken(token);
-    const dct = decodeToken(token);
-
-    const userID = dct!.id;
-    const body = await req.json();
-    const validatedData = BlogSchema.parse(body);
-    const isSlugExist = await prisma.blog.findUnique({
-      where: { slug: validatedData.slug },
-    });
-    if (isSlugExist) {
+    return await privateRoute(async (user) => {
+      const userID = user.id;
+      const body = await req.json();
+      const validatedData = BlogSchema.parse(body);
+      const isSlugExist = await prisma.blog.findUnique({
+        where: { slug: validatedData.slug },
+      });
+      if (isSlugExist) {
+        return NextResponse.json(
+          {
+            success: false,
+            code: "SLUG-DUPLICATED",
+            message: "SLUG-ALREADY-EXIST",
+          },
+          { status: 409 }
+        );
+      }
+      const newBlog = await prisma.blog.create({
+        data: {
+          author: {
+            connect: {
+              id: userID,
+            },
+          },
+          ...validatedData,
+        },
+        omit: {
+          createdAt: true,
+          updatedAt: true,
+        },
+        include: {
+          author: {
+            select: {
+              firstName: true,
+              lastName: true,
+            },
+          },
+        },
+      });
       return NextResponse.json(
         {
-          success: false,
-          code: "SLUG-DUPLICATED",
-          message: "SLUG-ALREADY-EXIST",
+          success: true,
+          newBlog,
         },
-        { status: 409 }
+        { status: 201 }
       );
-    }
-    const newBlog = await prisma.blog.create({
-      data: {
-        author: {
-          connect: {
-            id: userID,
-          },
-        },
-        ...validatedData,
-      },
-      omit: {
-        createdAt: true,
-        updatedAt: true,
-      },
-      include: {
-        author: {
-          select: {
-            firstName: true,
-            lastName: true,
-          },
-        },
-      },
     });
-    return NextResponse.json(
-      {
-        success: true,
-        newBlog,
-      },
-      { status: 201 }
-    );
   } catch (error) {
     return handleError({ error, defaultErr: "FAILED TO CREATE BLOG" });
   }
