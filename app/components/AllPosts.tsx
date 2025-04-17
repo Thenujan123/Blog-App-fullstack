@@ -44,10 +44,12 @@ const AllPosts = () => {
                 </p>
                 <p>
                   publised at:{" "}
-                  <span className="text-sm">{Date(blog.createdAt)}</span>
+                  <span className="text-sm">
+                    {new Date(blog.createdAt).toLocaleString()}
+                  </span>
                 </p>
                 <h1 className="text-2xl font-bold capitalize">{blog.title}</h1>
-                <p>{blog.content}</p>
+                <p className="text-ellipsis">{blog.content}</p>
                 <div className="w-full flex justify-between">
                   <Button className="w-[40%]" variant="contained">
                     Edit

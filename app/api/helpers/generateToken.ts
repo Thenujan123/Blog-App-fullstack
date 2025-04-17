@@ -2,7 +2,7 @@ import { sign } from "jsonwebtoken";
 
 const generateToken = (id: string) => {
   try {
-    const token = sign({ id }, process.env.JWT_SECRET!, { expiresIn: "10m" });
+    const token = sign({ id }, process.env.JWT_SECRET!, { expiresIn: "10w" });
     return token;
   } catch (error) {
     throw {
