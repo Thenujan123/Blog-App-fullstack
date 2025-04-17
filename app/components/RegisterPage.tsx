@@ -3,13 +3,14 @@ import React from "react";
 import { TextField, Button } from "@mui/material";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { UserType } from "../api/user/type";
+import { UserResponse } from "../api/user/type";
 import { UserSchema } from "@/Schemas/user.schema";
 import Cookie from "js-cookie";
 import api from "../api/helpers/baseApi";
 import { AxiosError } from "axios";
 import { toast } from "react-toastify";
 import { useRouter } from "next/navigation";
+import { CookieKey } from "../config/cookie.key";
 const RegisterPage = () => {
   const router = useRouter();
   const {
@@ -18,7 +19,7 @@ const RegisterPage = () => {
     formState: { errors },
     reset,
     setError,
-  } = useForm<UserType>({
+  } = useForm<UserResponse>({
     mode: "onTouched",
     resolver: zodResolver(UserSchema),
   });
@@ -33,6 +34,7 @@ const RegisterPage = () => {
             toast.success("User Registered Successfull !", {
               position: "top-right",
             });
+            Cookie.set(CookieKey.COOKIE_KEY, data.token);
             router.push("/");
           } catch (error) {
             const err = error as AxiosError<{ message: string }>;

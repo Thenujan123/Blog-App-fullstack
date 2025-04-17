@@ -3,6 +3,7 @@ import React, { useEffect } from "react";
 import { Button } from "@mui/material";
 import { useGetAllPosts } from "../client-apis/blog/useGetBlogs";
 import { CircularProgress } from "@mui/material";
+import Link from "next/link";
 const AllPosts = () => {
   const {
     data: blogs,
@@ -22,7 +23,13 @@ const AllPosts = () => {
   return (
     <div className="w-full h-dvh bg-slate-400 flex justify-center items-center">
       <div className="h-[100%] w-[70%] bg-100 mx-auto container bg-slate-200 p-5 rounded ">
-        <h1 className="text-center">search</h1>
+        <div className=" flex justify-between px-3">
+          <h1>Dark Mode</h1>
+          <h1 className="text-center">search</h1>
+          <div>
+            <Link href={"/register"}>Register</Link>
+          </div>
+        </div>
         <div className="p-10 h-[100%] rounded flex flex-col gap-10 shadow  overflow-auto">
           {blogs &&
             blogs.count > 0 &&
