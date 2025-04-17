@@ -2,7 +2,7 @@ import { verify } from "jsonwebtoken";
 
 export const verifyToken = (token: string) => {
   try {
-    verify(token, "SECRET");
+    verify(token, process.env.JWT_SECRET!);
   } catch (error) {
     const err = error as any;
 

@@ -16,7 +16,7 @@ export default async function privateRoute(
       );
     }
 
-    jwt.verify(token, "SECRET");
+    jwt.verify(token, process.env.JWT_SECRET!);
     const decodedToken = jwt.decode(token) as JwtPayload & { id: string };
 
     return cb(decodedToken);
