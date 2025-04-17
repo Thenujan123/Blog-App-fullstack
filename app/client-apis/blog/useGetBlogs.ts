@@ -3,9 +3,10 @@ import { useQuery } from "@tanstack/react-query";
 import { Blog } from "@prisma/client";
 import api from "@/app/api/helpers/baseApi";
 import { BlogType } from "@/app/api/blog/blogType";
+import { PaginationParams } from "@/app/components/type";
 
 // Custom hook for useQuery
-export const useGetAllPosts = (params: { search: string }) => {
+export const useGetAllPosts = (params: PaginationParams) => {
   // API call function
   const fetchAllPosts = async (): Promise<{
     allBlogs: BlogType[];

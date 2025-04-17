@@ -9,12 +9,14 @@ import { CookieKey } from "../config/cookie.key";
 import { FiSun } from "react-icons/fi"; // Feather icons
 import { FiMoon } from "react-icons/fi";
 import Search from "./Search";
+import { useRouter, useSearchParams } from "next/navigation";
+import { PaginationParams } from "./type";
 
 const AllPosts = () => {
   const [searchInput, setSearchInput] = useState("");
-
+  const searchParams = useSearchParams();
   const [debouncedSearch, setDebouncedSearch] = useState(searchInput);
-
+  const router = useRouter();
   useEffect(() => {
     const timer = setTimeout(() => {
       setDebouncedSearch(searchInput);
@@ -23,9 +25,11 @@ const AllPosts = () => {
     return () => clearTimeout(timer); // clear previous timer on each new keystroke
   }, [searchInput]);
 
-  const options = useMemo(() => {
+  const options = useMemo<PaginationParams>(() => {
     return {
       search: debouncedSearch,
+      page: parseInt(searchParams.get("page") || "1"),
+      size: parseInt(searchParams.get("size") || "25"),
     };
   }, [debouncedSearch]);
 
@@ -38,7 +42,11 @@ const AllPosts = () => {
   }, []);
 
   const { data: blogs, isLoading: BlogLoading } = useGetAllPosts(options);
-
+  const numberOfPages = useMemo<number>(() => {
+    const size = parseInt(searchParams.get("page") || "25", 10);
+    const count = blogs?.count || 0;
+    return Math.ceil(count / size);
+  }, [searchParams, blogs]);
   if (BlogLoading) {
     return (
       <div className="h-[90vh] w-full flex items-center justify-center">
@@ -102,6 +110,38 @@ const AllPosts = () => {
                 </div>
               </li>
             ))}
+        </div>
+
+        <div className="w-[80%] mx-auto flex justify-between">
+          <div className="flex gap-3">
+            {Array.from(Array(numberOfPages).keys()).map((i) => (
+              <Link
+                key={i}
+                href={`?page=${i + 1}&size=${searchParams.get("size") || "25"}`}
+                className="p-3 bg-indigo-800 text-white rounded cursor-pointer"
+              >
+                {i + 1}
+              </Link>
+            ))}
+          </div>
+          <div className="border border-indigo-800 p-5 rounded">
+            <select
+              name=""
+              id=""
+              onChange={(e) => {
+                const value = e.target.value;
+                const newUrl = `?page=${
+                  searchParams.get("page") || "1"
+                }&size=${value}`;
+                router.push(newUrl);
+              }}
+            >
+              <option value="2">2</option>
+              <option value="5">5</option>
+              <option value="25">25</option>
+              <option value="50">50</option>
+            </select>
+          </div>
         </div>
       </div>
     </div>
