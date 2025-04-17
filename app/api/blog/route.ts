@@ -82,7 +82,15 @@ export const GET = async (req: NextRequest) => {
     const [allBlogs, count] = await prisma.$transaction([
       prisma.blog.findMany({
         where: searchText,
-        omit: { createdAt: true, updatedAt: true },
+        include: {
+          author: {
+            select: {
+              firstName: true,
+              lastName: true,
+            },
+          },
+        },
+        omit: { updatedAt: true },
         skip: (page - 1) * size,
         take: size,
       }),
