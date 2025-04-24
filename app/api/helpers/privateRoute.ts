@@ -1,5 +1,5 @@
 import { headers } from "next/headers";
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 import jwt, { JwtPayload } from "jsonwebtoken";
 
 export default async function privateRoute(

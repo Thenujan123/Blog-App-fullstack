@@ -3,7 +3,7 @@ import React from "react";
 import { TextField, Button } from "@mui/material";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { UserResponse, UserType } from "../api/user/type";
+import { UserType } from "../api/user/type";
 import { UserSchema } from "@/Schemas/user.schema";
 import Cookie from "js-cookie";
 import api from "../api/helpers/baseApi";
@@ -18,7 +18,6 @@ const RegisterPage = () => {
     register,
     formState: { errors },
     reset,
-    setError,
   } = useForm<UserType>({
     mode: "onTouched",
     resolver: zodResolver(UserSchema),

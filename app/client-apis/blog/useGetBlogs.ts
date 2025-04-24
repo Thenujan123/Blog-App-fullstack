@@ -1,6 +1,6 @@
 "use client";
 import { useQuery } from "@tanstack/react-query";
-import { Blog } from "@prisma/client";
+
 import api from "@/app/api/helpers/baseApi";
 import { BlogType } from "@/app/api/blog/blogType";
 import { PaginationParams } from "@/app/components/type";

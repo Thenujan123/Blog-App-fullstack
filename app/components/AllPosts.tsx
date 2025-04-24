@@ -11,7 +11,10 @@ import { FiMoon } from "react-icons/fi";
 import Search from "./Search";
 import { useRouter, useSearchParams } from "next/navigation";
 import { PaginationParams } from "./type";
-
+import { useMutation } from "@tanstack/react-query";
+import api from "../api/helpers/baseApi";
+import { toast } from "react-toastify";
+import queryClient from "./queryClient";
 const AllPosts = () => {
   const [searchInput, setSearchInput] = useState("");
   const searchParams = useSearchParams();
@@ -41,6 +44,22 @@ const AllPosts = () => {
     setIsAuthenticated(!!token);
   }, []);
 
+  const DeletePost = async (id: string) => {
+    await api.delete(`blog/${id}`);
+    toast.error("Post Deletd Successfully.");
+  };
+  const { mutateAsync } = useMutation({
+    mutationFn: DeletePost,
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: ["get-all-posts"] });
+    },
+  });
+  const DeleteBlog = (id: string) => {
+    const isConfirm = window.confirm("Sure? Do you Wnat to Delete The Blog?");
+    if (isConfirm) {
+      mutateAsync(id);
+    }
+  };
   const { data: blogs, isLoading: BlogLoading } = useGetAllPosts(options);
   const numberOfPages = useMemo<number>(() => {
     const size = parseInt(searchParams.get("page") || "25", 10);
@@ -69,7 +88,9 @@ const AllPosts = () => {
           <Search searchInput={searchInput} setSearchInput={setSearchInput} />
           <div>
             {isAuthenticated ? (
-              <Link href="/admin/create text-white text-2xl">Create New</Link>
+              <Link href="/admin/create" className="text-white text-2xl">
+                Create New
+              </Link>
             ) : (
               <Link
                 href="/register"
@@ -104,7 +125,12 @@ const AllPosts = () => {
                   <Button className="w-[40%]" variant="contained">
                     Edit
                   </Button>
-                  <Button className="w-[40%]" variant="contained" color="error">
+                  <Button
+                    className="w-[40%]"
+                    variant="contained"
+                    color="error"
+                    onClick={() => DeleteBlog(blog.id)}
+                  >
                     Delete
                   </Button>
                 </div>
