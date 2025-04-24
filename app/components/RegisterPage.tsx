@@ -11,6 +11,7 @@ import { AxiosError } from "axios";
 import { toast } from "react-toastify";
 import { useRouter } from "next/navigation";
 import { CookieKey } from "../config/cookie.key";
+import useThemeStore from "../store/themeStore";
 const RegisterPage = () => {
   const router = useRouter();
   const {
@@ -22,8 +23,13 @@ const RegisterPage = () => {
     mode: "onTouched",
     resolver: zodResolver(UserSchema),
   });
+  const {
+    state: { mode },
+  } = useThemeStore();
   return (
-    <div className="h-dvh w-full flex items-center justify-center">
+    <div
+      className={`h-dvh w-full flex items-center justify-center dark:bg-blue-950 ${mode}`}
+    >
       <form
         className="w-[60%] h-[80%] mx-auto bg-slate-200 shadow-xl rounded pt-10 flex flex-col gap-8"
         onSubmit={handleSubmit(async (FormDatas) => {

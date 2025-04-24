@@ -11,6 +11,7 @@ import { toast } from "react-toastify";
 import queryClient from "@/app/components/queryClient";
 import { useRouter } from "next/navigation";
 import CircularProgress from "@mui/material/CircularProgress";
+import useThemeStore from "../store/themeStore";
 
 const CreateBlogPage = () => {
   const router = useRouter();
@@ -21,7 +22,9 @@ const CreateBlogPage = () => {
   }) => {
     await api.post("blog", FormData);
   };
-
+  const {
+    state: { mode },
+  } = useThemeStore();
   const { mutateAsync: createBlog, isPending } = useMutation({
     mutationFn: CreateBlog,
     onSettled: () => {
@@ -40,13 +43,17 @@ const CreateBlogPage = () => {
   });
   if (isPending) {
     return (
-      <div className="w-full h-[80vh] flex justify-center items-center">
+      <div
+        className={`w-full h-[80vh] flex justify-center items-center dark dark:bg-white`}
+      >
         <CircularProgress />
       </div>
     );
   }
   return (
-    <div className="w-full h-dvh flex items-center justify-center bg-slate-300">
+    <div
+      className={`w-full h-dvh flex items-center justify-center bg-slate-300 ${mode} dark:bg-blue-950`}
+    >
       <form
         className="rounded w-[60%] h-[70%] bg-slate-100 p-10 flex flex-col gap-8"
         onSubmit={handleSubmit(async (FormDatas) => {

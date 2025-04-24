@@ -15,6 +15,8 @@ import { useMutation } from "@tanstack/react-query";
 import api from "../api/helpers/baseApi";
 import { toast } from "react-toastify";
 import queryClient from "./queryClient";
+import useThemeStore from "../store/themeStore";
+import { dark } from "@mui/material/styles/createPalette";
 const AllPosts = () => {
   const [searchInput, setSearchInput] = useState("");
   const searchParams = useSearchParams();
@@ -38,6 +40,10 @@ const AllPosts = () => {
 
   const [light, setLight] = useState<boolean>(true);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const {
+    action: { setMode },
+    state: { mode },
+  } = useThemeStore();
 
   useEffect(() => {
     const token = Cookie.get(CookieKey.COOKIE_KEY);
@@ -73,24 +79,54 @@ const AllPosts = () => {
       </div>
     );
   }
+  const logOut = () => {
+    Cookie.remove(CookieKey.COOKIE_KEY);
+  };
 
   return (
-    <div className="w-full h-fit bg-slate-400 flex justify-center items-center">
-      <div className="h-fit w-[70%] bg-100 mx-auto container bg-slate-200 p-5 rounded ">
-        <div className=" flex justify-between p-6 bg-slate-500 ">
+    <div
+      className={`w-full h-fit bg-slate-400 flex justify-center items-center ${mode} dark:bg-blue-950`}
+    >
+      <div
+        className={`h-fit w-[70%] bg-100 mx-auto container bg-slate-200 p-5 rounded ${dark} dark:bg-blue-900 `}
+      >
+        <div
+          className={` flex justify-between p-6 bg-slate-500 ${mode} dark:bg-gray-950 `}
+        >
           <h1 className="text-white cursor-pointer">
             {light ? (
-              <FiSun className="text-3xl text-yellow-400" />
+              <FiSun
+                className="text-3xl text-yellow-400"
+                onClick={() => {
+                  setLight(false);
+                  setMode("dark");
+                }}
+              />
             ) : (
-              <FiMoon className="text-3xl text-blue-900" />
+              <FiMoon
+                className="text-3xl text-blue-900"
+                onClick={() => {
+                  setLight(true);
+                  setMode("light");
+                }}
+              />
             )}
           </h1>
           <Search searchInput={searchInput} setSearchInput={setSearchInput} />
           <div>
             {isAuthenticated ? (
-              <Link href="/admin/create" className="text-white text-2xl">
-                Create New
-              </Link>
+              <div className="flex flex-col gap-1">
+                <Link href="/admin/create" className="text-white text-2xl">
+                  Create New
+                </Link>
+                <button
+                  className="text-white cursor-pointer font-bold"
+                  type="button"
+                  onClick={() => logOut()}
+                >
+                  Logout
+                </button>
+              </div>
             ) : (
               <Link
                 href="/register"
@@ -101,17 +137,21 @@ const AllPosts = () => {
             )}
           </div>
         </div>
-        <div className="p-10 h-[100%] rounded flex flex-col gap-10 shadow  overflow-auto">
+        <div
+          className={`p-10 h-[100%] rounded flex flex-col gap-10 shadow  overflow-auto dark:bg-blue-950`}
+        >
           {blogs &&
             blogs.count > 0 &&
             blogs.allBlogs.map((blog) => (
               <li
                 key={blog.id}
-                className="bg-slate-50 p-6 rounded list-none flex flex-col gap-4"
+                className={`bg-slate-50 p-6 rounded list-none flex flex-col gap-4 dark:bg-slate-900 dark:text-white`}
               >
                 <p>
                   posted by:{" "}
-                  <span className="font-bold">{blog.author.firstName}</span>{" "}
+                  <span className={`font-bold dark:text-white`}>
+                    {blog.author.firstName}
+                  </span>{" "}
                 </p>
                 <p>
                   publised at:{" "}
@@ -138,19 +178,21 @@ const AllPosts = () => {
             ))}
         </div>
 
-        <div className="w-[80%] mx-auto flex justify-between">
+        <div
+          className={`w-[80%] mx-auto flex justify-between dark:bg-blue-950 dark:text-white`}
+        >
           <div className="flex gap-3">
             {Array.from(Array(numberOfPages).keys()).map((i) => (
               <Link
                 key={i}
                 href={`?page=${i + 1}&size=${searchParams.get("size") || "25"}`}
-                className="p-3 bg-indigo-800 text-white rounded cursor-pointer"
+                className="p-3 bg-indigo-800 text-white rounded cursor-pointer dark:bg-blue-500"
               >
                 {i + 1}
               </Link>
             ))}
           </div>
-          <div className="border border-indigo-800 p-5 rounded">
+          <div className="border border-indigo-800 p-5 rounded dark:bg-blue-500">
             <select
               name=""
               id=""
